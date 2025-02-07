@@ -30,12 +30,16 @@ load_dotenv()
 file_id = os.getenv("file_id")
 PORT = os.getenv("PORT")
 
-if file_id:
-    gdown.download(f"https://drive.google.com/uc?id={file_id}", "model.h5", quiet=False)
-else:
-    print("model is not loaded.")
+try:
 
-model = tf.keras.models.load_model("model.h5")
+    if file_id:
+        gdown.download(f"https://drive.google.com/uc?id={file_id}", "model.h5", quiet=False)
+
+    model = tf.keras.models.load_model("model.h5")
+        
+except Exception as e:
+    print(e)
+
 
 def face_skin_extract(pred,image_x):
     output = np.zeros_like(image_x, dtype=np.uint8)
