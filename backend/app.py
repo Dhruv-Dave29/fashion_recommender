@@ -28,8 +28,12 @@ app.add_middleware(
 
 load_dotenv()
 file_id = os.getenv("file_id")
+PORT = os.getenv("PORT")
 
-gdown.download(f"https://drive.google.com/uc?id={file_id}", "model.h5", quiet=False)
+if file_id:
+    gdown.download(f"https://drive.google.com/uc?id={file_id}", "model.h5", quiet=False)
+else:
+    print("model is not loaded.")
 
 model = tf.keras.models.load_model("model.h5")
 
@@ -156,4 +160,4 @@ async def process_image(file: UploadFile = File(...)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=PORT)
