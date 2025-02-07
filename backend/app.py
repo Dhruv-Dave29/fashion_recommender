@@ -1,7 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from uvicorn import run
-import os
+import uvicorn
 import tensorflow as tf
 from sklearn.cluster import KMeans
 import numpy as np
@@ -9,8 +8,9 @@ import cv2
 from webcolors import hex_to_rgb, rgb_to_hex
 from scipy.spatial import KDTree
 from collections import Counter
-
-
+import gdown
+import os
+from dotenv import load_dotenv
 
 app = FastAPI()
 
@@ -25,6 +25,11 @@ app.add_middleware(
     allow_methods = methods,
     allow_headers = headers    
 )
+
+load_dotenv()
+file_id = os.getenv("file_id")
+
+gdown.download(f"https://drive.google.com/uc?id={file_id}", "model.h5", quiet=False)
 
 model = tf.keras.models.load_model("model.h5")
 
@@ -46,14 +51,14 @@ classes = [
 
 def extract_dom_color_kmeans(img):
 
-    # Mask to exclude black pixels
-    mask = ~np.all(img == [0, 0, 0], axis=-1)
+    
+    mask = ~np.all(img == [0, 0, 0], axis=-1) # Mask to exclude black pixels
 
-    # Extract non-black pixels
-    non_black_pixels = img[mask]
+    
+    non_black_pixels = img[mask] # Extract non-black pixels
 
-    # Apply KMeans clustering on non-black pixels
-    k_cluster = KMeans(n_clusters=3, n_init="auto")
+    
+    k_cluster = KMeans(n_clusters=3, n_init="auto") # Apply KMeans clustering on non-black pixels
     k_cluster.fit(non_black_pixels)
 
 
@@ -72,9 +77,8 @@ def extract_dom_color_kmeans(img):
 
     cluster_centers = k_cluster.cluster_centers_
     
-    # Logging purposes
-    print("Cluster Percentages:", perc)
-    print("Cluster Centers (RGB):", cluster_centers)
+    # print("Cluster Percentages:", perc)
+    # print("Cluster Centers (RGB):", cluster_centers)
 
     val = list(perc.values())
     val.sort()
@@ -93,8 +97,6 @@ def extract_dom_color_kmeans(img):
     
     return rgb_list
 
-# Generate the palette
-# rgb_list = palette_perc(clt)
 
 ##############################################################################
 
