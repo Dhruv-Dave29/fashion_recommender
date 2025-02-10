@@ -45,7 +45,7 @@ function App() {
   return (
     <div style={{ padding: "1rem" }}>
       <h1>Face Skin Color Detection</h1>
-      <p>Select an image file (or use your device's camera on mobile) to get the skin color analysis.</p>
+      <p>Select an image file (or use your devices camera on mobile) to get the skin color analysis.</p>
       <input
         type="file"
         accept="image/*"
