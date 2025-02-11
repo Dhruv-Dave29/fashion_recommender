@@ -3,9 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Button from '../components/Button';
 import ColorPicker from '../components/ColorPicker';
-import { Wand2, ShoppingBag, AlertCircle, Palette, Wand, Camera, Sparkles, Crown, Heart } from 'lucide-react';
+import { AlertCircle, Palette, Wand, Camera, Sparkles, Heart, Check, X, Crown, RefreshCcw, ShoppingBag } from 'lucide-react';
+import { getRecommendedColors } from '../utils/colorMatching';
 
-interface Category {
+// Define interfaces for type safety
+interface ColorRecommendation {
+  color: string;
+  name: string;
+}
+
+interface ColorRecommendations {
+  recommended: ColorRecommendation[];
+  avoid: ColorRecommendation[];
+}
+
+interface CategoryType {
   id: string;
   name: string;
   colors: string[];
@@ -20,77 +32,14 @@ interface SkinAnalysisResult {
   length: number;
 }
 
-const getDynamicColors = (baseColor: string): string[] => {
-  // This function generates similar colors based on the detected base color.
-  // For simplicity, we will return a few hardcoded variations.
-  // In a real application, you might want to use a color manipulation library.
-  return [
-    baseColor, // Original color
-    adjustColorBrightness(baseColor), // Lighter shade
-    adjustColorBrightness(baseColor), // Darker shade
-    adjustColorSaturation(baseColor), // More saturated
-    adjustColorSaturation(baseColor), // Less saturated
-  ];
-};
-
-const adjustColorBrightness = (color: string): string => {
-  // Simplified implementation
-  return color; 
-};
-
-const adjustColorSaturation = (color: string): string => {
-  // Remove unused 'amount' parameter
-  return color;
-};
-
 const DemoTryOn = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>('lipstick');
   const [selectedColor, setSelectedColor] = useState<string>();
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [skinAnalysis, setSkinAnalysis] = useState<SkinAnalysisResult | null>(null);
+  const [colorRecommendations, setColorRecommendations] = useState<ColorRecommendations | null>(null);
   
-  // Declare categories after state hooks
-  const categories = skinAnalysis ? [
-    {
-      id: 'lipstick',
-      name: 'Lipstick',
-      icon: <Palette className="w-5 h-5" />,
-      colors: getDynamicColors(skinAnalysis[1]), // Use the first detected color
-      description: 'Perfect your pout with vibrant colors'
-    },
-    {
-      id: 'eyeshadow',
-      name: 'Eye Shadow',
-      icon: <Wand className="w-5 h-5" />,
-      colors: getDynamicColors(skinAnalysis[1]), // Use the first detected color
-      description: 'Create stunning eye looks'
-    },
-    {
-      id: 'foundation',
-      name: 'Foundation',
-      icon: <Sparkles className="w-5 h-5" />,
-      colors: getDynamicColors(skinAnalysis[1]), // Use the first detected color
-      description: 'Flawless base for your look'
-    },
-    {
-      id: 'blush',
-      name: 'Blush',
-      icon: <Heart className="w-5 h-5" />,
-      colors: getDynamicColors(skinAnalysis[1]), // Use the first detected color
-      description: 'Add a natural flush'
-    },
-    {
-      id: 'eyeliner',
-      name: 'Eyeliner',
-      icon: <Wand className="w-5 h-5" />,
-      colors: getDynamicColors(skinAnalysis[1]), // Use the first detected color
-      description: 'Define your eyes'
-    },
-  ] : [];
-
-  const currentCategory = categories.find(cat => cat.id === selectedCategory);
-
   useEffect(() => {
     const image = sessionStorage.getItem('capturedImage');
     if (!image) {
@@ -99,12 +48,57 @@ const DemoTryOn = () => {
       setCapturedImage(image);
     }
 
-    // Get the skin analysis results from sessionStorage
     const analysisData = sessionStorage.getItem('skinAnalysis');
     if (analysisData) {
-      setSkinAnalysis(JSON.parse(analysisData));
+      const parsedData = JSON.parse(analysisData) as SkinAnalysisResult;
+      setSkinAnalysis(parsedData);
+      
+      if (parsedData?.[1]) {
+        const recommendations = getRecommendedColors(parsedData[1]);
+        setColorRecommendations(recommendations);
+      }
     }
   }, [navigate]);
+
+  const categories: CategoryType[] = skinAnalysis ? [
+    {
+      id: 'lipstick',
+      name: 'Lipstick',
+      icon: <Palette className="w-5 h-5" />,
+      colors: ['#FF0000', '#FF1493', '#FF69B4', '#DC143C', '#8B0000'],
+      description: 'Perfect your pout with vibrant colors'
+    },
+    {
+      id: 'eyeshadow',
+      name: 'Eye Shadow',
+      icon: <Wand className="w-5 h-5" />,
+      colors: ['#A0522D', '#DEB887', '#D2691E', '#8B4513', '#CD853F'],
+      description: 'Create stunning eye looks'
+    },
+    {
+      id: 'foundation',
+      name: 'Foundation',
+      icon: <Sparkles className="w-5 h-5" />,
+      colors: colorRecommendations?.recommended.map((rec: ColorRecommendation) => rec.color) || [],
+      description: 'Flawless base for your look'
+    },
+    {
+      id: 'blush',
+      name: 'Blush',
+      icon: <Heart className="w-5 h-5" />,
+      colors: colorRecommendations?.recommended.map((rec: ColorRecommendation) => rec.color) || [],
+      description: 'Add a natural flush'
+    },
+    {
+      id: 'eyeliner',
+      name: 'Eyeliner',
+      icon: <Wand className="w-5 h-5" />,
+      colors: colorRecommendations?.recommended.map((rec: ColorRecommendation) => rec.color) || [],
+      description: 'Define your eyes'
+    },
+  ] : [];
+
+  const currentCategory = categories.find(cat => cat.id === selectedCategory);
 
   if (!capturedImage) {
     return (
@@ -122,166 +116,174 @@ const DemoTryOn = () => {
     );
   }
 
-  const renderSkinAnalysis = () => {
-    if (!skinAnalysis) return null;
-
-    return (
-      <div className="mt-6 p-4 bg-purple-50 rounded-xl">
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">Your Skin Analysis</h3>
-        
-        {/* Image Preview */}
-        <div className="mb-4">
-          <img 
-            src={sessionStorage.getItem('capturedImage') || ''} 
-            alt="Captured" 
-            className="w-32 h-32 object-cover rounded-lg mx-auto"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white p-3 rounded-lg">
-            <p className="text-sm text-gray-600">Skin Tone</p>
-            <p className="font-medium text-gray-900">{skinAnalysis[0].label}</p>
-          </div>
-          <div className="bg-white p-3 rounded-lg">
-            <p className="text-sm text-gray-600">Detected Colors</p>
-            <div className="flex items-center gap-2">
-              <div 
-                className="w-6 h-6 rounded-full border border-gray-200"
-                style={{ backgroundColor: skinAnalysis[1] }}
-              />
-              <p className="font-medium text-gray-900">{skinAnalysis[1]}</p>
-              <div 
-                className="w-6 h-6 rounded-full border border-gray-200"
-                style={{ backgroundColor: skinAnalysis[2] }}
-              />
-              <p className="font-medium text-gray-900">{skinAnalysis[2]}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // const renderMakeupCategories = () => {
-  //   return (
-  //     <div className="mt-6 p-4 bg-white rounded-xl shadow-md">
-  //       <h3 className="text-lg font-semibold text-gray-900 mb-3">Makeup Categories</h3>
-  //       <ul className="list-disc list-inside text-gray-700">
-  //         <li><strong>Foundation:</strong> Choose a shade close to {skinAnalysis?.[0]?.label}.</li>
-  //         <li><strong>Eyeliner:</strong> Dark brown or black for a classic look.</li>
-  //         <li><strong>Eyeshadow:</strong> Warm tones like gold or bronze to complement your skin tone.</li>
-  //         <li><strong>Blush:</strong> Soft peach or rosy shades to add a natural flush.</li>
-  //         <li><strong>Lipstick:</strong> Nude or soft pink shades for a balanced look.</li>
-  //       </ul>
-  //     </div>
-  //   );
-  // };
-
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-white p-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md mb-4">
-              <Crown className="w-5 h-5 text-purple-500" />
-              <span className="text-purple-700 font-medium">Virtual Beauty Studio</span>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-white">
+        {/* Header Section */}
+        <div className="bg-white border-b border-purple-100">
+          <div className="max-w-7xl mx-auto py-6 px-4">
+            <div className="text-center mb-4">
+              <span className="inline-flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full text-purple-700 font-medium text-sm mb-2">
+                <Crown className="w-4 h-4" />
+                Virtual Beauty Studio
+              </span>
+              <h1 className="text-3xl font-bold text-gray-900">Your Personal Color Analysis</h1>
+              <p className="text-gray-600 mt-2">Discover your perfect colors and enhance your natural beauty</p>
             </div>
-            <h1 className="text-3xl font-bold text-gray-800">Transform Your Look</h1>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Left Sidebar - Product Categories */}
-            <div className="lg:col-span-4">
-              <div className="bg-white rounded-3xl shadow-xl p-6 backdrop-blur-lg bg-opacity-90 border border-purple-100">
-                <h2 className="text-2xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
-                  <Palette className="w-6 h-6 text-purple-500" />
-                  Makeup Categories
-                </h2>
-                <div className="space-y-3">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => setSelectedCategory(category.id)}
-                      className={`w-full flex flex-col gap-2 p-4 rounded-2xl transition-all duration-300 ${
-                        selectedCategory === category.id
-                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                          : 'hover:bg-purple-50 text-gray-700 border border-gray-100'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className={selectedCategory === category.id ? 'text-white' : 'text-purple-500'}>
-                          {category.icon}
-                        </span>
-                        <span className="font-medium">{category.name}</span>
-                      </div>
-                      <p className={`text-sm ${selectedCategory === category.id ? 'text-white/80' : 'text-gray-500'}`}>
-                        {category.description}
-                      </p>
-                    </button>
-                  ))}
+        <div className="max-w-7xl mx-auto p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column: Skin Analysis & Photo */}
+            <div className="lg:col-span-1 space-y-6">
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-200 to-pink-200 transform -skew-y-3"></div>
+                  <img 
+                    src={capturedImage || ''} 
+                    alt="Your photo" 
+                    className="relative w-full h-64 object-cover"
+                  />
                 </div>
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Skin Analysis</h3>
+                  {skinAnalysis && (
+                    <div className="space-y-4">
+                      <div className="bg-purple-50 p-4 rounded-xl">
+                        <p className="text-sm text-gray-600">Detected Skin Tone</p>
+                        <p className="font-medium text-gray-900">{skinAnalysis[0].label}</p>
+                      </div>
+                      <div className="flex gap-4">
+                        {[skinAnalysis[1], skinAnalysis[2]].map((color, idx) => (
+                          <div key={idx} className="flex-1 bg-gray-50 p-3 rounded-xl">
+                            <div 
+                              className="w-full h-12 rounded-lg mb-2"
+                              style={{ backgroundColor: color }}
+                            />
+                            <p className="text-xs text-center text-gray-600">{color}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Single New Photo Button */}
+              <div className="flex gap-3">
+                <Button
+                  variant="secondary"
+                  icon={RefreshCcw}
+                  onClick={() => navigate('/demo/process')}
+                  className="flex-1"
+                >
+                  New Photo
+                </Button>
               </div>
             </div>
 
-            {/* Center - Preview */}
-            <div className="lg:col-span-8">
-              <div className="bg-white rounded-3xl shadow-xl p-8 backdrop-blur-lg bg-opacity-90 border border-purple-100">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-200 to-pink-200 rounded-2xl transform -rotate-1"></div>
-                  <div className="relative bg-white rounded-2xl p-2 shadow-lg">
-                    <img
-                      src={capturedImage}
-                      alt="Your photo"
-                      className="w-full rounded-xl object-contain"
-                    />
+            {/* Middle Column: Color Recommendations */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Outfit Color Analysis */}
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-purple-500" />
+                  Your Color Palette
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Recommended Colors */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-5 h-5 text-green-500" />
+                      <h4 className="font-medium text-gray-900">Colors That Flatter You</h4>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {colorRecommendations?.recommended.map((rec: ColorRecommendation, idx: number) => (
+                        <div key={idx} className="flex items-center gap-2 bg-gray-50 p-3 rounded-xl">
+                          <div 
+                            className="w-10 h-10 rounded-lg shadow-inner"
+                            style={{ backgroundColor: rec.color }}
+                          />
+                          <span className="text-sm text-gray-700">{rec.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Colors to Avoid */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <X className="w-5 h-5 text-red-500" />
+                      <h4 className="font-medium text-gray-900">Colors to Avoid</h4>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {colorRecommendations?.avoid.map((rec: ColorRecommendation, idx: number) => (
+                        <div key={idx} className="flex items-center gap-2 bg-gray-50 p-3 rounded-xl">
+                          <div 
+                            className="w-10 h-10 rounded-lg shadow-inner"
+                            style={{ backgroundColor: rec.color }}
+                          />
+                          <span className="text-sm text-gray-700">{rec.name}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Color Selection */}
-                <div className="mt-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold flex items-center gap-2">
-                      <Wand className="w-5 h-5 text-purple-500" />
-                      Select Your Shade
-                    </h3>
-                    <span className="text-sm text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
-                      {currentCategory?.name}
-                    </span>
+              {/* Virtual Try-On Section */}
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-purple-500" />
+                  Virtual Try-On
+                </h3>
+                <div className="space-y-6">
+                  {/* Category Selection */}
+                  <div className="flex overflow-x-auto gap-3 pb-2 scrollbar-hide">
+                    {categories.map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => setSelectedCategory(category.id)}
+                        className={`flex-shrink-0 flex items-center gap-2 px-4 py-3 rounded-xl transition-all duration-300 ${
+                          selectedCategory === category.id
+                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                            : 'hover:bg-purple-50 text-gray-700 border border-gray-100'
+                        }`}
+                      >
+                        <span className={selectedCategory === category.id ? 'text-white' : 'text-purple-500'}>
+                          {category.icon}
+                        </span>
+                        <span className="font-medium whitespace-nowrap">{category.name}</span>
+                      </button>
+                    ))}
                   </div>
+
+                  {/* Color Selection */}
                   {currentCategory && (
-                    <ColorPicker
-                      colors={currentCategory.colors}
-                      selectedColor={selectedColor}
-                      onChange={setSelectedColor}
-                    />
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <p className="text-sm text-gray-600 mb-4">{currentCategory.description}</p>
+                      <ColorPicker
+                        colors={currentCategory.colors}
+                        selectedColor={selectedColor}
+                        onChange={setSelectedColor}
+                      />
+                    </div>
                   )}
                 </div>
 
-                {/* Skin Analysis */}
-                {renderSkinAnalysis()}
-
-                {/* Makeup Suggestions
-                {renderMakeupCategories()} */}
-
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-4 mt-8 pt-6 border-t border-gray-100">
+                {/* Single View Products Button */}
+                <div className="mt-6 pt-6 border-t border-gray-100">
                   <Button
                     variant="primary"
-                    icon={Wand2}
-                    onClick={() => navigate('/demo/process')}
-                    className="transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl"
-                  >
-                    Try Different Photo
-                  </Button>
-                  <Button
-                    variant="secondary"
                     icon={ShoppingBag}
                     onClick={() => navigate('/demo/recommendations')}
-                    className="transform hover:scale-105 transition-transform shadow-md hover:shadow-lg"
+                    className="w-full sm:w-auto"
                   >
-                    View Products
+                    <span className="flex items-center gap-2">
+                      View Recommended Products
+                      <ShoppingBag className="w-4 h-4" />
+                    </span>
                   </Button>
                 </div>
               </div>
