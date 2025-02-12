@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import ImageCapture from '../components/ImageCapture';
-import { Camera, Shield, Sun, Image, ArrowRight } from 'lucide-react';
+import { Camera, Shield, Image, RefreshCw } from 'lucide-react';
 import { Client } from "@gradio/client";
 
 // Add interface at the top of the file
@@ -68,117 +68,126 @@ const DemoProcess = () => {
     }
   };
 
-  const features = [
-    {
-      icon: <Camera className="w-10 h-10 text-purple-500" />,
-      title: "Quick Capture",
-      description: "Take a selfie or upload a photo in seconds"
-    },
-    {
-      icon: <Image className="w-10 h-10 text-purple-500" />,
-      title: "AI Analysis",
-      description: "Advanced skin tone detection technology"
-    },
-    {
-      icon: <ArrowRight className="w-10 h-10 text-purple-500" />,
-      title: "Instant Results",
-      description: "Get personalized recommendations immediately"
-    }
-  ];
-
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-purple-50">
-        <div className="max-w-6xl mx-auto px-4 py-12">
-          {/* Hero Section */}
-          <div className="text-center mb-16">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              Discover Your Perfect <span className="text-purple-600">Color Palette</span>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+        {/* Hero Section with Animation */}
+        <div className="max-w-6xl mx-auto px-4 py-16">
+          <div className="text-center mb-16 animate-fadeIn">
+            <h1 className="text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Find Your Perfect 
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
+                {" "}Color Match
+              </span>
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Experience personalized beauty recommendations powered by AI. Start by taking a photo or uploading one.
+              Our AI-powered tool analyzes your skin tone to create your personalized color palette
             </p>
           </div>
 
-          {/* Main Content */}
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-            <div className="bg-white rounded-3xl shadow-xl p-8 order-2 md:order-1">
-              {cameraError && (
-                <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 flex items-center">
-                  <Shield className="w-5 h-5 mr-2" />
-                  {cameraError}
-                </div>
-              )}
-              
-              {isProcessing ? (
-                <div className="text-center py-16">
-                  <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-purple-500 border-t-transparent"></div>
-                  <p className="mt-6 text-lg text-gray-600 font-medium">Processing your image...</p>
-                  <p className="text-gray-500">This will only take a moment</p>
-                </div>
-              ) : (
-                <ImageCapture onImageCapture={handleImageCapture} />
-              )}
-            </div>
+          {/* Main Content Grid */}
+          <div className="grid md:grid-cols-2 gap-12 items-start mb-20">
+            {/* Left Column - Image Capture */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-3xl shadow-xl p-8 transition-all duration-300 hover:shadow-2xl">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+                  Take or Upload Photo
+                </h2>
+                
+                {cameraError && (
+                  <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 flex items-center">
+                    <Shield className="w-5 h-5 mr-2" />
+                    <p>{cameraError}</p>
+                  </div>
+                )}
 
-            <div className="space-y-8 order-1 md:order-2">
-              <div className="bg-purple-50 rounded-3xl p-8">
-                <div className="flex items-center mb-6">
-                  <Sun className="w-8 h-8 text-purple-600 mr-3" />
-                  <h3 className="text-2xl font-semibold text-gray-900">
-                    Tips for Best Results
-                  </h3>
+                {isProcessing ? (
+                  <div className="text-center py-12">
+                    <RefreshCw className="w-12 h-12 text-purple-500 animate-spin mx-auto mb-4" />
+                    <p className="text-lg font-medium text-gray-700">Processing your image...</p>
+                    <p className="text-gray-500">This will only take a moment</p>
+                  </div>
+                ) : (
+                  <ImageCapture onImageCapture={handleImageCapture} />
+                )}
+              </div>
+
+              {/* Quick Tips */}
+              <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-8">
+                <div className="flex items-center mb-4">
+                  <Camera className="w-6 h-6 text-purple-600 mr-2" />
+                  <h3 className="text-lg font-semibold text-gray-900">Quick Tips</h3>
                 </div>
-                <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <span className="w-2 h-2 mt-2 bg-purple-500 rounded-full mr-3"></span>
-                    <p className="text-gray-700">Ensure good lighting on your face</p>
+                <ul className="space-y-3 text-gray-700">
+                  <li className="flex items-center">
+                    <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2" />
+                    Use natural lighting
                   </li>
-                  <li className="flex items-start">
-                    <span className="w-2 h-2 mt-2 bg-purple-500 rounded-full mr-3"></span>
-                    <p className="text-gray-700">Remove glasses and accessories</p>
+                  <li className="flex items-center">
+                    <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2" />
+                    Face the camera directly
                   </li>
-                  <li className="flex items-start">
-                    <span className="w-2 h-2 mt-2 bg-purple-500 rounded-full mr-3"></span>
-                    <p className="text-gray-700">Face the camera directly</p>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="w-2 h-2 mt-2 bg-purple-500 rounded-full mr-3"></span>
-                    <p className="text-gray-700">Maintain a neutral expression</p>
+                  <li className="flex items-center">
+                    <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2" />
+                    Remove glasses if wearing
                   </li>
                 </ul>
               </div>
             </div>
-          </div>
 
-          {/* Features Section */}
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div 
-                key={index}
-                className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="bg-purple-50 w-20 h-20 rounded-2xl flex items-center justify-center mb-6">
-                  {feature.icon}
+            {/* Right Column - Process Steps */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-3xl shadow-lg p-8">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+                  How It Works
+                </h2>
+                <div className="space-y-8">
+                  {[
+                    {
+                      icon: <Camera className="w-8 h-8 text-purple-500" />,
+                      title: "Capture",
+                      description: "Take a clear photo of your face in good lighting"
+                    },
+                    {
+                      icon: <RefreshCw className="w-8 h-8 text-purple-500" />,
+                      title: "Analysis",
+                      description: "Our AI analyzes your unique skin tone"
+                    },
+                    {
+                      icon: <Image className="w-8 h-8 text-purple-500" />,
+                      title: "Results",
+                      description: "Get your personalized color recommendations"
+                    }
+                  ].map((step, index) => (
+                    <div key={index} className="flex items-start">
+                      <div className="bg-purple-50 p-3 rounded-xl mr-4">
+                        {step.icon}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 mb-1">
+                          {step.title}
+                        </h3>
+                        <p className="text-gray-600">{step.description}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {feature.description}
-                </p>
               </div>
-            ))}
+            </div>
           </div>
         </div>
 
         {/* Loading Overlay */}
         {isAnalyzing && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center">
-            <div className="bg-white rounded-2xl p-8 text-center max-w-md w-full mx-4 shadow-2xl">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500 border-t-transparent mx-auto mb-6"></div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-2">Analyzing your image</h3>
-              <p className="text-gray-600">Our AI is detecting your unique skin tone and features</p>
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl animate-fadeIn">
+              <RefreshCw className="w-12 h-12 text-purple-500 animate-spin mx-auto mb-6" />
+              <h3 className="text-2xl font-semibold text-gray-900 mb-2 text-center">
+                Analyzing your skin tone
+              </h3>
+              <p className="text-gray-600 text-center">
+                Our AI is working its magic to find your perfect color matches
+              </p>
             </div>
           </div>
         )}

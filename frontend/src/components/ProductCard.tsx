@@ -1,14 +1,14 @@
 import React from 'react';
 import { Star, ShoppingCart, Heart } from 'lucide-react';
-import Button from './Button';
 
 interface ProductCardProps {
   id: number;
   name: string;
   brand: string;
   price: string;
-  rating: number;
+  rating?: number;
   image: string;
+  mst?: string;
   onAddToCart?: () => void;
   onFavorite?: () => void;
 }
@@ -17,57 +17,72 @@ const ProductCard: React.FC<ProductCardProps> = ({
   name,
   brand,
   price,
-  rating,
+  rating = 0,
   image,
   onAddToCart,
-  onFavorite,
+  onFavorite
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-      <div className="aspect-square relative">
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+      {/* Image Container */}
+      <div className="relative aspect-square overflow-hidden bg-gray-100">
         <img
           src={image}
           alt={name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = '/placeholder-product.png';
+            target.onerror = null;
+          }}
         />
-        <button
-          onClick={onFavorite}
-          className="absolute top-4 right-4 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
-        >
-          <Heart className="h-5 w-5 text-gray-600" />
-        </button>
       </div>
-      
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-purple-600 font-medium">
-            {brand}
-          </span>
-          <div className="flex items-center">
-            <Star className="h-4 w-4 text-yellow-400 mr-1" />
-            <span className="text-sm text-gray-600">{rating}</span>
+
+      {/* Product Info */}
+      <div className="p-4">
+        <div className="text-sm text-gray-500 mb-1">{brand}</div>
+        <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">{name}</h3>
+        
+        {/* Rating */}
+        {typeof rating === 'number' && (
+          <div className="flex items-center mb-2">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                className={`w-4 h-4 ${
+                  i < Math.round(rating)
+                    ? 'text-yellow-400 fill-current'
+                    : 'text-gray-300'
+                }`}
+              />
+            ))}
+            <span className="ml-1 text-sm text-gray-600">
+              {rating.toFixed(1)}
+            </span>
           </div>
-        </div>
-        
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          {name}
-        </h3>
-        
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-bold text-gray-900">
-            {price}
-          </span>
-          <Button
-            variant="primary"
-            icon={ShoppingCart}
-            onClick={onAddToCart}
-          >
-            Add to Cart
-          </Button>
+        )}
+
+        {/* Price and Actions */}
+        <div className="flex items-center justify-between mt-3">
+          <span className="text-lg font-semibold text-gray-900">{price}</span>
+          <div className="flex space-x-2">
+            <button
+              onClick={onFavorite}
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <Heart className="w-5 h-5 text-gray-600" />
+            </button>
+            <button
+              onClick={onAddToCart}
+              className="p-2 rounded-full bg-purple-100 hover:bg-purple-200 transition-colors"
+            >
+              <ShoppingCart className="w-5 h-5 text-purple-600" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default ProductCard
+export default ProductCard;
