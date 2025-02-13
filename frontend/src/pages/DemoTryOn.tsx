@@ -60,42 +60,83 @@ const DemoTryOn = () => {
     }
   }, [navigate]);
 
-  const categories: CategoryType[] = skinAnalysis ? [
-    {
-      id: 'lipstick',
-      name: 'Lipstick',
-      icon: <Palette className="w-5 h-5" />,
-      colors: ['#FF0000', '#FF1493', '#FF69B4', '#DC143C', '#8B0000'],
-      description: 'Perfect your pout with vibrant colors'
-    },
-    {
-      id: 'eyeshadow',
-      name: 'Eye Shadow',
-      icon: <Wand className="w-5 h-5" />,
-      colors: ['#A0522D', '#DEB887', '#D2691E', '#8B4513', '#CD853F'],
-      description: 'Create stunning eye looks'
-    },
+  // Helper function to get makeup colors based on Monk skin tone
+  const getMakeupColors = (monkScale: string) => {
+    // Base colors for different Monk scales
+    const makeupPalettes = {
+      // Light skin tones (Monk 1-3)
+      light: {
+        foundation: ['#FFE0BD', '#FFD1A1', '#FFC183', '#FFDEB3', '#FFE4C4'],
+        blush: ['#FFB6C1', '#FF69B4', '#DB7093', '#FFC0CB', '#FFE4E1'],
+        lipstick: ['#FF1493', '#FF69B4', '#DC143C', '#FF4500', '#FF6B6B'],
+        eyeshadow: ['#DDA0DD', '#DA70D6', '#BA55D3', '#9370DB', '#8B008B'],
+        eyeliner: ['#2F4F4F', '#4B0082', '#800000', '#8B4513', '#000000']
+      },
+      // Medium skin tones (Monk 4-7)
+      medium: {
+        foundation: ['#DEB887', '#D2B48C', '#CD853F', '#BC8F8F', '#F4A460'],
+        blush: ['#E9967A', '#FF7F50', '#FF6347', '#CD5C5C', '#DC143C'],
+        lipstick: ['#8B0000', '#800000', '#B22222', '#DC143C', '#FF4500'],
+        eyeshadow: ['#8B4513', '#A0522D', '#6B4423', '#8B008B', '#4B0082'],
+        eyeliner: ['#2F4F4F', '#000000', '#8B4513', '#4A0404', '#1A1A1A']
+      },
+      // Deep skin tones (Monk 8-10)
+      deep: {
+        foundation: ['#8B4513', '#A0522D', '#8B5742', '#996515', '#8B4513'],
+        blush: ['#CD5C5C', '#DC143C', '#8B0000', '#800000', '#B22222'],
+        lipstick: ['#8B0000', '#800000', '#4A0404', '#DC143C', '#CC0033'],
+        eyeshadow: ['#8B4513', '#800000', '#4B0082', '#000080', '#2F4F4F'],
+        eyeliner: ['#000000', '#1A1A1A', '#4A0404', '#2F4F4F', '#4B0082']
+      }
+    };
+
+    // Determine skin tone category based on Monk scale
+    const skinToneCategory = 
+      parseInt(monkScale) <= 3 ? 'light' :
+      parseInt(monkScale) <= 7 ? 'medium' : 'deep';
+
+    return makeupPalettes[skinToneCategory];
+  };
+
+  // Get makeup colors based on skin analysis
+  const makeupColors = skinAnalysis ? getMakeupColors(skinAnalysis[0].label.split(' ')[1]) : null;
+
+  const categories: CategoryType[] = makeupColors ? [
     {
       id: 'foundation',
       name: 'Foundation',
-      icon: <Sparkles className="w-5 h-5" />,
-      colors: colorRecommendations?.recommended.map((rec: ColorRecommendation) => rec.color) || [],
-      description: 'Flawless base for your look'
+      icon: <Crown className="w-5 h-5" />,
+      colors: makeupColors.foundation,
+      description: 'Find your perfect match'
     },
     {
       id: 'blush',
       name: 'Blush',
       icon: <Heart className="w-5 h-5" />,
-      colors: colorRecommendations?.recommended.map((rec: ColorRecommendation) => rec.color) || [],
+      colors: makeupColors.blush,
       description: 'Add a natural flush'
+    },
+    {
+      id: 'lipstick',
+      name: 'Lipstick',
+      icon: <Sparkles className="w-5 h-5" />,
+      colors: makeupColors.lipstick,
+      description: 'Perfect your pout'
+    },
+    {
+      id: 'eyeshadow',
+      name: 'Eyeshadow',
+      icon: <Palette className="w-5 h-5" />,
+      colors: makeupColors.eyeshadow,
+      description: 'Define your eyes'
     },
     {
       id: 'eyeliner',
       name: 'Eyeliner',
       icon: <Wand className="w-5 h-5" />,
-      colors: colorRecommendations?.recommended.map((rec: ColorRecommendation) => rec.color) || [],
-      description: 'Define your eyes'
-    },
+      colors: makeupColors.eyeliner,
+      description: 'Frame your gaze'
+    }
   ] : [];
 
   const currentCategory = categories.find(cat => cat.id === selectedCategory);

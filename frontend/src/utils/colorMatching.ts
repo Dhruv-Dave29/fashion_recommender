@@ -72,18 +72,18 @@ export function getRecommendedColors(skinToneHex: string): ColorRecommendations 
   else if (monkTone <= 6) {
     return {
       recommended: [
-        { color: '#D35F5F', name: 'Terra Cotta' },
-        { color: '#2B7B78', name: 'Deep Teal' },
-        { color: '#5F87D3', name: 'Steel Blue' },
-        { color: '#79A98B', name: 'Sage' },
-        { color: '#D6A3C5', name: 'Dusty Rose' },
-        { color: '#8B63A6', name: 'Plum Purple' }
+        { color: '#CD5C5C', name: 'Indian Red' },
+        { color: '#20B2AA', name: 'Light Sea Green' },
+        { color: '#4169E1', name: 'Royal Blue' },
+        { color: '#556B2F', name: 'Dark Olive Green' },
+        { color: '#C71585', name: 'Medium Violet Red' },
+        { color: '#9932CC', name: 'Dark Orchid' }
       ],
       avoid: [
-        { color: '#FFE135', name: 'Bright Yellow' },
-        { color: '#FF4D00', name: 'Orange Red' },
-        { color: '#39FF14', name: 'Neon Green' },
-        { color: '#FF1493', name: 'Hot Pink' }
+        { color: '#FFFF00', name: 'Bright Yellow' },
+        { color: '#FF1493', name: 'Deep Pink' },
+        { color: '#00FF00', name: 'Lime Green' },
+        { color: '#FFB6C1', name: 'Light Pink' }
       ]
     };
   }
@@ -129,16 +129,16 @@ export function getOutfitRecommendations(skinToneHex: string): OutfitRecommendat
   else if (monkTone <= 6) {
     return {
       recommended: [
+        { color: '#191970', name: 'Midnight Blue' },
         { color: '#8B4513', name: 'Saddle Brown' },
-        { color: '#006400', name: 'Dark Green' },
-        { color: '#483D8B', name: 'Dark Slate Blue' },
-        { color: '#800000', name: 'Maroon' }
+        { color: '#556B2F', name: 'Dark Olive Green' },
+        { color: '#800080', name: 'Purple' }
       ],
       avoid: [
-        { color: '#FFB6C1', name: 'Light Pink' },
+        { color: '#FFE4E1', name: 'Misty Rose' },
         { color: '#98FB98', name: 'Pale Green' },
-        { color: '#87CEEB', name: 'Sky Blue' },
-        { color: '#DDA0DD', name: 'Plum' }
+        { color: '#E0FFFF', name: 'Light Cyan' },
+        { color: '#FFF0F5', name: 'Lavender Blush' }
       ]
     };
   }

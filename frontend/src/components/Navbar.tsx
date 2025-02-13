@@ -24,7 +24,7 @@ const Navbar = () => {
             <Link to="/" className="flex items-center space-x-2 group">
               <Sparkles className="h-8 w-8 text-purple-600 transition-transform group-hover:scale-110" />
               <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                Arbelle
+              HueMatch
               </span>
             </Link>
           </div>

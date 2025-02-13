@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-// import ProductCard from '../components/ProductCard';
-import { Camera, Star, Sparkles, Crown } from 'lucide-react';
+import ProductCard from '../components/ProductCard';
+import { Camera, Star, Sparkles, Crown, Shirt, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductRecommendations from '../components/ProductRecommendations';
 import { Product } from '../types/Product';
 
@@ -14,10 +14,27 @@ interface SkinAnalysisResult {
 interface ApiProduct {
   product?: string;
   name?: string;
-  brand: string;
+  brand?: string;
+  Brand?: string;
+  Product_Name?: string;
+  "Product Name"?: string;
+  Price?: string;
+  Image_URL?: string;
+  "Image URL"?: string;
   imgSrc?: string;
   image?: string;
+  image_url?: string;
+  product_name?: string;
+  price?: string;
+  rating?: number;
   mst: string;
+}
+
+interface Product {
+  'Product Name': string;
+  'Price': string;
+  'Product Type': string;
+  'Image URL': string;
 }
 
 const DemoRecommendations = () => {
@@ -28,6 +45,10 @@ const DemoRecommendations = () => {
   const [skinAnalysis, setSkinAnalysis] = useState<SkinAnalysisResult | null>(null);
   const [skinHex] = useState<string>('');  // Removed unused setter
   const [monkHex] = useState<string>('');  // Removed unused setter
+  const [activeTab, setActiveTab] = useState<'makeup' | 'outfit'>('makeup');
+  const [outfits, setOutfits] = useState<Product[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -38,34 +59,52 @@ const DemoRecommendations = () => {
         }
 
         const analysisArray = JSON.parse(storedAnalysis);
-        console.log('Skin Analysis Data:', analysisArray);
+        setSkinAnalysis(analysisArray[0]);
 
-        const monkData = analysisArray[0] as SkinAnalysisResult;
-        const derivedHex = analysisArray[1] as string;
-        const monkHexColor = analysisArray[2] as string;
-        
-        setSkinAnalysis(monkData);
+        let response;
+        let transformedProducts;
 
-        const monkNumber = monkData.label.split(' ')[1];
-        const response = await fetch(`http://127.0.0.1:8000/data/?mst=Monk ${monkNumber}`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch product recommendations');
+        if (activeTab === 'makeup') {
+          // Fetch makeup products from /data/ endpoint
+          response = await fetch(`http://localhost:8000/data/?mst=${analysisArray[0].label}&page=1&limit=15`);
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch makeup recommendations');
+          }
+
+          const data = await response.json();
+          transformedProducts = data.data.map((item: ApiProduct) => ({
+            id: Math.random(),
+            name: item.product_name || item.Product_Name || item.name || '',
+            brand: item.brand || item.Brand || 'Unknown',
+            price: item.price || item.Price || '$29.99',
+            rating: item.rating || 4.5,
+            image: item.imgSrc || item.image_url || item.Image_URL || item.image || '',
+            image_url: item.imgSrc || item.image_url || item.Image_URL || item.image || '',
+            mst: item.mst || ''
+          }));
+
+          // Debug log for makeup products
+          console.log('Makeup product data:', data.data[0]);
+          console.log('Transformed makeup product:', transformedProducts[0]);
+        } else {
+          // Fetch random outfit products from /api/random-outfits endpoint
+          response = await fetch('http://localhost:8000/api/random-outfits?limit=24');
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch outfit recommendations');
+          }
+
+          const data = await response.json();
+          console.log('Received data:', data); // Debug log
+          
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          
+          setOutfits(data.data);
+          setError(null);
         }
-
-        const result = await response.json();
-        console.log('API Response:', result);
-
-        const transformedProducts = result.data.map((item: ApiProduct, index: number) => ({
-          id: index + 1,
-          name: item.name || item.product || '',
-          brand: item.brand,
-          price: '$49.99',
-          rating: 4.5,
-          image: item.image || '',
-          image_url: item.imgSrc || item.image || '',
-          mst: item.mst
-        }));
 
         setProducts(transformedProducts);
         setLoading(false);
@@ -77,7 +116,22 @@ const DemoRecommendations = () => {
     };
 
     fetchProducts();
-  }, [navigate]);
+  }, [navigate, activeTab]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(outfits.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = outfits.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Handle page changes
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Generate page numbers array
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   if (error) {
     return (
@@ -137,6 +191,34 @@ const DemoRecommendations = () => {
           </div>
         </div>
 
+        {/* Tab Buttons */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+          <div className="flex justify-center space-x-4">
+            <button
+              onClick={() => setActiveTab('makeup')}
+              className={`px-6 py-2 rounded-lg flex items-center space-x-2 ${
+                activeTab === 'makeup'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white text-gray-600 hover:bg-purple-50'
+              }`}
+            >
+              <Sparkles className="h-5 w-5" />
+              <span>Makeup</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('outfit')}
+              className={`px-6 py-2 rounded-lg flex items-center space-x-2 ${
+                activeTab === 'outfit'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white text-gray-600 hover:bg-purple-50'
+              }`}
+            >
+              <Shirt className="h-5 w-5" />
+              <span>Outfits</span>
+            </button>
+          </div>
+        </div>
+
         {/* Products Grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
           {loading ? (
@@ -145,10 +227,66 @@ const DemoRecommendations = () => {
             </div>
           ) : (
             <>
-              <ProductRecommendations 
-                skinTone={skinAnalysis?.label || ''}
-                products={products}
-              />
+              {activeTab === 'makeup' ? (
+                <ProductRecommendations 
+                  skinTone={skinAnalysis?.label || ''}
+                  products={products}
+                  type={activeTab}
+                />
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {currentItems.map((product, index) => (
+                      <ProductCard
+                        key={index}
+                        id={index}
+                        name={product['Product Name']}
+                        brand="H&M"
+                        price={product['Price']}
+                        image={product['Image URL']}
+                        rating={4.5}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center space-x-2 mt-8">
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="p-2 rounded-md border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </button>
+
+                      <div className="flex space-x-1">
+                        {pageNumbers.map((number) => (
+                          <button
+                            key={number}
+                            onClick={() => handlePageChange(number)}
+                            className={`px-4 py-2 rounded-md ${
+                              currentPage === number
+                                ? 'bg-purple-600 text-white'
+                                : 'border border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            {number}
+                          </button>
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="p-2 rounded-md border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
 
               {/* Additional Features Section */}
               <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
