@@ -86,7 +86,6 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
               onFavorite={() => {
                 console.log('Add to favorites:', product.name);
               }}
-              type={type}
             />
           </Suspense>
         ))}
