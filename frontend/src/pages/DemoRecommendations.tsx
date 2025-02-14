@@ -1,15 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import ProductCard from '../components/ProductCard';
 import { Camera, Star, Sparkles, Crown, Shirt, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductRecommendations from '../components/ProductRecommendations';
-import { Product } from '../types/Product';
+// import { Product } from '../types/Product';
+interface Product {
+  id?: number;
+  brand: string;
+  name: string;
+  price: string;
+  rating: number;
+  image: string;
+  image_url: string;
+  mst: string;
+  desc: string
+} 
 
 interface SkinAnalysisResult {
   label: string;
   confidences: null;
 }
+
+
 
 interface ApiProduct {
   product?: string;
@@ -28,6 +41,8 @@ interface ApiProduct {
   price?: string;
   rating?: number;
   mst: string;
+  desc: string;
+  imgAlt: string;
 }
 
 interface Product {
@@ -60,13 +75,14 @@ const DemoRecommendations = () => {
 
         const analysisArray = JSON.parse(storedAnalysis);
         setSkinAnalysis(analysisArray[0]);
-
+        console.log("ff"+storedAnalysis)
+        console.log("oghex")
+        console.log(analysisArray)
         let response;
         let transformedProducts;
-
         if (activeTab === 'makeup') {
           // Fetch makeup products from /data/ endpoint
-          response = await fetch(`http://localhost:8000/data/?mst=${analysisArray[0].label}&page=1&limit=15`);
+          response = await fetch(`http://localhost:8000/data/?mst=${analysisArray[0].label}&page=1&limit=15&ogcolor=${analysisArray[1].substring(1)}`);
           
           if (!response.ok) {
             throw new Error('Failed to fetch makeup recommendations');
@@ -81,7 +97,8 @@ const DemoRecommendations = () => {
             rating: item.rating || 4.5,
             image: item.imgSrc || item.image_url || item.Image_URL || item.image || '',
             image_url: item.imgSrc || item.image_url || item.Image_URL || item.image || '',
-            mst: item.mst || ''
+            mst: item.mst || '',
+            desc: item.imgAlt || ''
           }));
 
           // Debug log for makeup products
@@ -244,6 +261,7 @@ const DemoRecommendations = () => {
                         brand="H&M"
                         price={product['Price']}
                         image={product['Image URL']}
+                        desc= {product['Image URL']}
                         rating={4.5}
                       />
                     ))}
@@ -294,7 +312,7 @@ const DemoRecommendations = () => {
                   {
                     icon: <Camera className="h-8 w-8 text-purple-500" />,
                     title: "Try Before You Buy",
-                    description: "Virtual try-on technology lets you see the look before purchasing"
+                    description: "Recommended Color Palettes technology lets you see the look before purchasing"
                   },
                   {
                     icon: <Star className="h-8 w-8 text-purple-500" />,

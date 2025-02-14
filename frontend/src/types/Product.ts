@@ -7,4 +7,5 @@ export interface Product {
   image: string;
   image_url: string;
   mst: string;
+  desc: string;
 } 
