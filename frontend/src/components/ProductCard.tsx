@@ -33,6 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onFavorite,
 }) => {
   const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(`"${brand}"`)}+${encodeURIComponent(`"${name}"`)}+${encodeURIComponent(`"${desc}"`)}`;
+  const shouldHideDescription = price.includes('$ ');
   return (
     <>
     <a href={googleSearchUrl}>
@@ -53,7 +54,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
       <div className="p-4">
         <div className="text-sm text-gray-500 mb-1">{brand}</div>
-        <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">{name} {desc}</h3>
+        <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">{name} {!shouldHideDescription && desc}</h3>
         
         {/* Rating */}
         {/* {typeof rating === 'number' && (

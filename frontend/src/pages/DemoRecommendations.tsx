@@ -107,6 +107,7 @@ const DemoRecommendations = () => {
         } else {
           // Fetch random outfit products from /api/random-outfits endpoint
           response = await fetch('http://localhost:8000/api/random-outfits?limit=24');
+          // response = await fetch('http://localhost:8000/products');
           
           if (!response.ok) {
             throw new Error('Failed to fetch outfit recommendations');

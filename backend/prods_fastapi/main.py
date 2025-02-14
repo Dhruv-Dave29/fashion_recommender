@@ -81,7 +81,7 @@ def get_products(product_type: str = Query(None), random: bool = Query(False)):
     for product in products:
         product["Product_Name"] = product.get("Product Name", "")
         product["Brand"] = product.get("Brand", "H&M")
-        product["Price"] = product.get("Price", "$29.99")
+        product["Price"] = product.get("Price", "$ 29.99")
         product["Image_URL"] = product.get("Image URL", "")
     
     return products
@@ -90,17 +90,18 @@ def get_products(product_type: str = Query(None), random: bool = Query(False)):
 @app.post("/api/recommendations")
 async def get_recommendations(request: dict):
     """Fetch recommended H&M products based on type (makeup or outfit)."""
-    filtered_df = df_hm.copy()
+    filtered_df1 = df_hm.copy()
     
     recommendation_type = request.get("type", "makeup")
 
     if recommendation_type == "makeup":
-        filtered_df = filtered_df[
-            filtered_df["Product Type"].str.contains("makeup|cosmetic|lipstick|foundation", case=False, na=False)
-        ]
+        # filtered_df = filtered_df[
+        #     filtered_df["Product Type"].str.contains("makeup|cosmetic|lipstick|foundation", case=False, na=False)
+        # ]
+        pass
     else:  # outfit recommendations
-        filtered_df = filtered_df[
-            filtered_df["Product Type"].str.contains("dress|top|shirt|pants", case=False, na=False)
+        filtered_df1 = filtered_df1[
+            filtered_df1["Product Type"].str.contains("dress|top|shirt|pants", case=False, na=False)
         ]
 
     # Take random 15 products

@@ -75,7 +75,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
               id={product.id || 0}
               name={product.name}
               brand={product.brand}
-              desc={type === 'makeup' ? product.desc : ''}
+              desc={product.brand==="H%26M" ? '' : product.desc}
               price={product.price}
               rating={product.rating}
               image={product.image || product.image_url}
