@@ -49,7 +49,7 @@ const galleryImages = [
   },
   {
     url: "https://images.unsplash.com/photo-1596704017704-0b27b1c0af01?auto=format&fit=crop&q=80&w=600",
-    alt: "Virtual Try-On"
+    alt: "Recommended Color Palettes"
   }
 ];
 
@@ -161,7 +161,7 @@ const LandingPage = () => {
                 Take or Upload Photo
               </h3>
               <p className="text-gray-600">
-                Use your camera or upload a photo to start the virtual try-on experience
+                Use your camera or upload a photo to start the Recommended Color Palettes experience
               </p>
             </div>
 

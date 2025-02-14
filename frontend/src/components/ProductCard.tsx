@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Star, ShoppingCart, Heart } from 'lucide-react';
 
 interface ProductCardProps {
@@ -9,6 +10,7 @@ interface ProductCardProps {
   rating?: number;
   image: string;
   mst?: string;
+  desc: string;
   desc: string;
   onAddToCart?: () => void;
   onFavorite?: () => void;
@@ -27,11 +29,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
   name,
   brand,
   price,
-  rating = 0,
   image,
   desc,
+  desc,
   onAddToCart,
-  onFavorite
+  onFavorite,
+  type = 'makeup'
 }) => {
   const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(`"${brand}"`)}+${encodeURIComponent(`"${name}"`)}+${encodeURIComponent(`"${desc}"`)}`;
   return (
@@ -41,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         <img
-          src={image}
+          src={displayImage}
           alt={name}
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           onError={(e) => {
@@ -52,7 +55,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
         />
       </div>
 
-      {/* Product Info */}
       <div className="p-4">
         <div className="text-sm text-gray-500 mb-1">{brand}</div>
         <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">{name} {desc}</h3>

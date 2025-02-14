@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import ProductCard from './ProductCard';
+import React, { useState, Suspense, lazy } from 'react';
+// import ProductCard from './ProductCard';
 import { Product } from '../types/Product';
 import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from 'lucide-react';
 
@@ -9,6 +9,18 @@ interface ProductRecommendationsProps {
   productsPerPage?: number;
   type: 'makeup' | 'outfit';
 }
+
+// Rename to LazyProductCard
+const LazyProductCard = lazy(() => import('./ProductCard'));
+
+// Loading skeleton component
+const ProductCardSkeleton = () => (
+  <div className="animate-pulse">
+    <div className="bg-gray-200 h-48 rounded-lg mb-4"></div>
+    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+  </div>
+);
 
 const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
   skinTone,
@@ -57,24 +69,26 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {currentProducts.map((product) => (
-          <ProductCard
-            key={product.id || product.name}
-            id={product.id || 0}
-            name={product.name}
-            brand={product.brand}
-            desc = {product.desc}
-            price={product.price}
-            rating={product.rating}
-            image={product.image || product.image_url}
-            // image_url={product.image_url}
-            mst={product.mst}
-            onAddToCart={() => {
-              console.log('Add to cart:', product.name);
-            }}
-            onFavorite={() => {
-              console.log('Add to favorites:', product.name);
-            }}
-          />
+          <Suspense key={product.id || product.name} fallback={<ProductCardSkeleton />}>
+            <LazyProductCard
+              key={product.id || product.name}
+              id={product.id || 0}
+              name={product.name}
+              brand={product.brand}
+              desc={type === 'makeup' ? product.desc : ''}
+              price={product.price}
+              rating={product.rating}
+              image={product.image || product.image_url}
+              mst={product.mst}
+              onAddToCart={() => {
+                console.log('Add to cart:', product.name);
+              }}
+              onFavorite={() => {
+                console.log('Add to favorites:', product.name);
+              }}
+              type={type}
+            />
+          </Suspense>
         ))}
       </div>
 

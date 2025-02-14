@@ -312,7 +312,7 @@ const DemoRecommendations = () => {
                   {
                     icon: <Camera className="h-8 w-8 text-purple-500" />,
                     title: "Try Before You Buy",
-                    description: "Virtual try-on technology lets you see the look before purchasing"
+                    description: "Recommended Color Palettes technology lets you see the look before purchasing"
                   },
                   {
                     icon: <Star className="h-8 w-8 text-purple-500" />,
