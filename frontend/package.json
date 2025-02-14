@@ -11,10 +11,13 @@
   },
   "dependencies": {
     "@gradio/client": "^1.11.0",
+    "clsx": "^2.1.1",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.22.3",
+    "react-webcam": "^7.2.0",
+    "tailwind-merge": "^3.0.1",
     "tinycolor2": "^1.6.0"
   },
   "devDependencies": {

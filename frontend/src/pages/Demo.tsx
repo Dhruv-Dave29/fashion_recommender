@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { Camera, Upload, Sparkles, Star, Info } from 'lucide-react';
@@ -14,12 +14,12 @@ const Demo = () => {
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <Sparkles className="h-12 w-12 text-purple-500 animate-pulse" />
           </div>
-          <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 sm:text-6xl mb-6">
-            Virtual Beauty Studio
+          <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 sm:text-6xl mb-6">
+            Fashion AI Assistant
           </h1>
           <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Transform your look instantly with our AI-powered beauty technology. 
-            Experience the future of makeup try-on.
+            
           </p>
           
           {/* Floating badges */}

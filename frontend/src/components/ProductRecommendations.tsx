@@ -62,10 +62,11 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
             id={product.id || 0}
             name={product.name}
             brand={product.brand}
+            desc = {product.desc}
             price={product.price}
             rating={product.rating}
             image={product.image || product.image_url}
-            image_url={product.image_url}
+            // image_url={product.image_url}
             mst={product.mst}
             onAddToCart={() => {
               console.log('Add to cart:', product.name);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Star, ShoppingCart, Heart } from 'lucide-react';
 
 interface ProductCardProps {
@@ -9,9 +9,19 @@ interface ProductCardProps {
   rating?: number;
   image: string;
   mst?: string;
+  desc: string;
   onAddToCart?: () => void;
   onFavorite?: () => void;
 }
+
+// useEffect(()=>{
+
+//   }
+// },[])
+// const storedAnalysis1 = sessionStorage.getItem('skinAnalysis');
+// if (!storedAnalysis1) {
+//   throw new Error('No skin analysis found. Please complete the skin analysis first.');}
+// const analysisArray1 = JSON.parse(storedAnalysis1);
 
 const ProductCard: React.FC<ProductCardProps> = ({
   name,
@@ -19,11 +29,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
   price,
   rating = 0,
   image,
+  desc,
   onAddToCart,
   onFavorite
 }) => {
+  const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(`"${brand}"`)}+${encodeURIComponent(`"${name}"`)}+${encodeURIComponent(`"${desc}"`)}`;
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+    <>
+    <a href={googleSearchUrl}>
+    <div  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         <img
@@ -32,7 +46,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = '/placeholder-product.png';
+            // target.src = `https://placehold.co/600x400/${analysisArray1[1].substring(1)}/${analysisArray1[1].substring(1)}/png`;
             target.onerror = null;
           }}
         />
@@ -41,10 +55,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {/* Product Info */}
       <div className="p-4">
         <div className="text-sm text-gray-500 mb-1">{brand}</div>
-        <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">{name}</h3>
+        <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">{name} {desc}</h3>
         
         {/* Rating */}
-        {typeof rating === 'number' && (
+        {/* {typeof rating === 'number' && (
           <div className="flex items-center mb-2">
             {[...Array(5)].map((_, i) => (
               <Star
@@ -60,7 +74,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               {rating.toFixed(1)}
             </span>
           </div>
-        )}
+        )} */}
 
         {/* Price and Actions */}
         <div className="flex items-center justify-between mt-3">
@@ -82,6 +96,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       </div>
     </div>
+    </a>
+    </>
   );
 };
 

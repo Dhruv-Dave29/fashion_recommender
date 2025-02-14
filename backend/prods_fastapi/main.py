@@ -2,7 +2,7 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import json
-
+import math 
 app = FastAPI()
 
 # Add CORS middleware
@@ -14,11 +14,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def color_distance(color1, color2):
+    """Calculate Euclidean distance between two RGB colors."""
+    return math.sqrt(sum((c1 - c2) ** 2 for c1, c2 in zip(color1, color2)))
+
 # Load CSV data for H&M products
 df_hm = pd.read_csv("hm_products2.csv").fillna("")  # Fill NaN values
 
 # Load CSV data for Ulta & Sephora products
-df_sephora = pd.read_csv("ulta_sephora_with_mst_index.csv").fillna("")
+df_sephora = pd.read_csv("ulta_with_mst_index.csv").fillna("")
 
 
 @app.get("/")
@@ -52,7 +56,7 @@ async def get_random_outfits(limit: int = Query(default=8)):
         return {"error": str(e)}
 
 
-# 📌 **H&M Products API**
+# **H&M Products API**
 @app.get("/products")
 def get_products(product_type: str = Query(None), random: bool = Query(False)):
     """Fetch H&M products filtered by product type."""
@@ -105,12 +109,13 @@ async def get_recommendations(request: dict):
     return {"products": json.loads(filtered_df.to_json(orient="records"))}
 
 
-# 📌 **Ulta & Sephora Products API**
+# **Ulta & Sephora Products API**
 @app.get("/data/")
 def get_data(
     mst: str = Query(None, description="Filter by 'mst' column"),
     page: int = Query(1, description="Page number", ge=1),
     limit: int = Query(15, description="Items per page", le=15),
+    ogcolor: str = Query(None, description="Filter by nearest colour"),
 ):
     """Fetch paginated Ulta & Sephora makeup products."""
     # Filter by product name or description instead of Product Type
@@ -122,6 +127,34 @@ def get_data(
 
     if mst:
         filtered_df = filtered_df[filtered_df["mst"] == mst]
+    # print(ogcolor)
+    # filtered_df = write here
+    if ogcolor:
+        # Function to calculate Euclidean distance between two hex colors
+        def hex_to_rgb(hex_code):
+            hex_code = hex_code.lstrip('#')
+            return tuple(int(hex_code[i:i+2], 16) for i in (0, 2, 4))
+
+        def color_distance(color1, color2):
+            return sum((c1 - c2) ** 2 for c1, c2 in zip(color1, color2)) ** 0.5
+
+        # Convert ogcolor to RGB
+        target_rgb = hex_to_rgb(ogcolor)
+
+        # Add a new column for distance calculation
+        filtered_df['distance'] = filtered_df['hex'].apply(
+            lambda x: color_distance(target_rgb, hex_to_rgb(x))
+        )
+
+        # Sort by brand, product, and distance to find the nearest color for each product
+        filtered_df = filtered_df.sort_values(by=['brand', 'product', 'distance'])
+
+        # Drop duplicates to keep only the nearest color for each brand and product
+        filtered_df = filtered_df.drop_duplicates(subset=['brand', 'product'], keep='first')
+
+        # Drop the distance column as it's no longer needed
+        filtered_df = filtered_df.drop(columns=['distance'])
+        #end of finding closest color
 
     total_items = len(filtered_df)
     total_pages = (total_items + limit - 1) // limit

@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { 
@@ -18,8 +18,8 @@ import {
 const features = [
   {
     icon: Camera,
-    title: "Virtual Try-On",
-    description: "Experience makeup products in real-time with our advanced AR technology"
+    title: "Color Theory",
+    description: "color suggestions based on concepts of color theory."
   },
   {
     icon: ShoppingBag,
@@ -67,10 +67,10 @@ const LandingPage = () => {
               <div className="absolute -left-20 -top-20 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
               <div className="absolute -right-20 -bottom-20 w-40 h-40 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
               <h1 className="text-6xl lg:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 leading-tight">
-                Beauty AR & AI Solutions
+                Get tailored insight through AI
               </h1>
               <p className="text-xl text-gray-600 max-w-xl relative">
-                Drive sales across channels with beauty AR and AI solutions designed for cosmetic brands
+                Drive sales across channels with AI solutions designed for cosmetic brands
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
@@ -148,7 +148,7 @@ const LandingPage = () => {
               How It Works
             </h2>
             <p className="mt-4 text-xl text-gray-600">
-              Get started with virtual try-on in three simple steps
+              Get started with HueMatch in three simple steps
             </p>
           </div>
 
