@@ -158,4 +158,5 @@ export function getOutfitRecommendations(skinToneHex: string): OutfitRecommendat
       ]
     };
   }
+  
 }

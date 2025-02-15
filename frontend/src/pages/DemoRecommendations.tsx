@@ -4,6 +4,8 @@ import Layout from '../components/Layout';
 import ProductCard from '../components/ProductCard';
 import { Camera, Star, Sparkles, Crown, Shirt, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductRecommendations from '../components/ProductRecommendations';
+import { getRecommendedColors } from '../utils/colorMatching';
+
 // import { Product } from '../types/Product';
 interface Product {
   id?: number;
@@ -43,6 +45,12 @@ interface ApiProduct {
   mst: string;
   desc: string;
   imgAlt: string;
+  gender: string;
+  masterCategory: string;
+  subCategory: string;
+  baseColour: string;
+  usage: string;
+  season: string;
 }
 
 interface Product {
@@ -58,7 +66,7 @@ const DemoRecommendations = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [skinAnalysis, setSkinAnalysis] = useState<SkinAnalysisResult | null>(null);
-  const [skinHex] = useState<string>('');  // Removed unused setter
+  const [skinHex,setSkinHex] = useState<string>('');  // Removed unused setter
   const [monkHex] = useState<string>('');  // Removed unused setter
   const [activeTab, setActiveTab] = useState<'makeup' | 'outfit'>('makeup');
   const [outfits, setOutfits] = useState<Product[]>([]);
@@ -78,6 +86,8 @@ const DemoRecommendations = () => {
         console.log("ff"+storedAnalysis)
         console.log("oghex")
         console.log(analysisArray)
+        setSkinHex(analysisArray[1])
+        
         let response;
         let transformedProducts;
         if (activeTab === 'makeup') {
@@ -106,8 +116,13 @@ const DemoRecommendations = () => {
           console.log('Transformed makeup product:', transformedProducts[0]);
         } else {
           // Fetch random outfit products from /api/random-outfits endpoint
-          response = await fetch('http://localhost:8000/api/random-outfits?limit=24');
-          // response = await fetch('http://localhost:8000/products');
+          // response = await fetch('http://localhost:8000/api/random-outfits?limit=24');
+          // console.log(getRecommendedColors(skinHex))
+          console.log("lalala"+skinHex)
+
+          const reccolor = getRecommendedColors(skinHex)
+          console.log(reccolor.recommended)
+          response = await fetch(`http://localhost:8000/apparel?color=${reccolor.recommended[0].name}&color=${reccolor.recommended[1].name}&color=${reccolor.recommended[2].name}&color=${reccolor.recommended[3].name}&page=1&limit=24`);
           
           if (!response.ok) {
             throw new Error('Failed to fetch outfit recommendations');
@@ -259,10 +274,11 @@ const DemoRecommendations = () => {
                         key={index}
                         id={index}
                         name={product['Product Name']}
-                        brand="H&M"
+                        brand="Apparel"
                         price={product['Price']}
                         image={product['Image URL']}
-                        desc= {product['Image URL']}
+                        desc=""
+                        // desc= {product['Image URL']}
                         rating={4.5}
                       />
                     ))}

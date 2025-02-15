@@ -2,7 +2,8 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import json
-import math 
+import math
+from typing import List
 app = FastAPI()
 
 # Add CORS middleware
@@ -14,6 +15,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+color_mapping = {
+    "Coral Red": "Red",
+    "Turquoise": "Turquoise Blue",
+    "Ocean Blue": "Blue",
+    "Sage Green": "Green",
+    "Soft Pink": "Pink",
+    "Royal Purple": "Purple",
+    "Indian Red": "Red",
+    "Light Sea Green": "Sea Green",
+    "Royal Blue": "Blue",
+    "Dark Olive Green": "Olive",
+    "Medium Violet Red": "Magenta",
+    "Dark Orchid": "Purple",
+    "Gold": "Gold",
+    "Orange Red": "Orange",
+    "Spring Green": "Green",
+    "Deep Pink": "Pink",
+    "Indigo": "Purple",
+    "Dark Orange": "Orange",
+    "Navy Blue": "Navy Blue",
+    "Maroon": "Maroon",
+    "Olive Green": "Olive",
+    "Midnight Blue": "Navy Blue",
+    "Saddle Brown": "Brown",
+    "Purple": "Purple",
+    "Red": "Red",
+    "Lime": "Green"
+}
+
 def color_distance(color1, color2):
     """Calculate Euclidean distance between two RGB colors."""
     return math.sqrt(sum((c1 - c2) ** 2 for c1, c2 in zip(color1, color2)))
@@ -24,10 +54,58 @@ df_hm = pd.read_csv("hm_products2.csv").fillna("")  # Fill NaN values
 # Load CSV data for Ulta & Sephora products
 df_sephora = pd.read_csv("ulta_with_mst_index.csv").fillna("")
 
+df_apparel = pd.read_csv("apparel.csv")
 
 @app.get("/")
 def home():
     return {"message": "Welcome to the API!"}
+
+
+@app.get("/apparel")
+def get_apparel(
+    gender: str = Query(None, description="Filter by gender (e.g., 'Men', 'Women')"),
+    color: List[str] = Query(None, description="Filter by one or more baseColour values (e.g., 'Blue', 'Black')"),
+    page: int = Query(1, description="Page number (default: 1)", ge=1),
+    limit: int = Query(24, description="Items per page (default: 24)", le=100)
+):
+    if color:
+        color = [color_mapping.get(c, c) for c in color]  # Use the original value if key is not found
+        color = list(set(color))  # Step 2: Remove duplicates
+        color = [c for c in color if pd.notna(c)]
+
+    filtered_df = df_apparel.copy()
+
+    if gender:
+        filtered_df = filtered_df[filtered_df["gender"] == gender]
+
+    if color:
+        filtered_df = filtered_df[filtered_df["baseColour"].isin(color)]
+
+    # limited_df = filtered_df.groupby("baseColour").apply(lambda x: x.sample(min(len(x), 6), random_state=42)).reset_index(drop=True)
+
+    randomized_df = filtered_df.sample(frac=1,random_state=56).reset_index(drop=True)
+
+    # Apply overall limit of 36 items
+    randomized_df = randomized_df.head(24)
+
+    total_items = len(randomized_df)
+    total_pages = (total_items + limit - 1) // limit
+    start = (page - 1) * limit
+    end = start + limit
+
+    paginated_df = randomized_df.iloc[start:end]
+
+    # Convert the paginated DataFrame to JSON
+    result = paginated_df.to_dict(orient="records")
+
+    return {
+        "data": result,
+        "page": page,
+        "limit": limit,
+        "total_items": total_items,
+        "total_pages": total_pages
+    }
+
 
 
 @app.get("/api/random-outfits")
