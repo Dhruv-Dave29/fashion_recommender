@@ -83,7 +83,7 @@ def get_apparel(
 
     # limited_df = filtered_df.groupby("baseColour").apply(lambda x: x.sample(min(len(x), 6), random_state=42)).reset_index(drop=True)
 
-    randomized_df = filtered_df.sample(frac=1,random_state=56).reset_index(drop=True)
+    randomized_df = filtered_df.sample(frac=1,random_state=28).reset_index(drop=True)
 
     # Apply overall limit of 36 items
     randomized_df = randomized_df.head(24)
