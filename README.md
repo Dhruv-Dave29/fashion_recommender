@@ -1,4 +1,4 @@
-# HueMatch Beauty - Virtual Beauty Try-On Platform
+# HueMatch Beauty - Beauty Try-On Platform
 
 HueMatch Beauty is an AI-powered virtual beauty platform that helps users find their perfect color matches for makeup and fashion based on their skin tone analysis.
 
