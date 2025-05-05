@@ -92,7 +92,7 @@ const DemoRecommendations = () => {
         let transformedProducts;
         if (activeTab === 'makeup') {
           // Fetch makeup products from /data/ endpoint
-          response = await fetch(`http://localhost:8000/data/?mst=${analysisArray[0].label}&page=1&limit=15&ogcolor=${analysisArray[1].substring(1)}`);
+          response = await fetch(`https://fashion-recommender-t95b.onrender.com/data/?mst=${analysisArray[0].label}&page=1&limit=15&ogcolor=${analysisArray[1].substring(1)}`);
           
           if (!response.ok) {
             throw new Error('Failed to fetch makeup recommendations');
