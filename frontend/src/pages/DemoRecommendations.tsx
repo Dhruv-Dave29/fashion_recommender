@@ -122,7 +122,7 @@ const DemoRecommendations = () => {
 
           const reccolor = getRecommendedColors(skinHex)
           console.log(reccolor.recommended)
-          response = await fetch(`http://localhost:8000/apparel?color=${reccolor.recommended[0].name}&color=${reccolor.recommended[1].name}&color=${reccolor.recommended[2].name}&color=${reccolor.recommended[3].name}&page=1&limit=24`);
+          response = await fetch(`https://fashion-recommender-t95b.onrender.com/apparel?color=${reccolor.recommended[0].name}&color=${reccolor.recommended[1].name}&color=${reccolor.recommended[2].name}&color=${reccolor.recommended[3].name}&page=1&limit=24`);
           
           if (!response.ok) {
             throw new Error('Failed to fetch outfit recommendations');
