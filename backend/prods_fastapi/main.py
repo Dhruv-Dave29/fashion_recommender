@@ -9,7 +9,7 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Your React app's origin
+    allow_origins=["http://localhost:5173","https://fashion-recommender-rust.vercel.app"],  # Your React app's origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
